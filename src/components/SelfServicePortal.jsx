@@ -25,6 +25,7 @@ import {
   getCustomerCheckInTime,
 } from '../services/firebaseService';
 import moment from 'moment-timezone';
+import { useSearchParams } from 'react-router-dom';
 
 function SelfServicePortal() {
   const [firstName, setFirstName] = useState('');
@@ -42,11 +43,89 @@ function SelfServicePortal() {
   const [checkInTime, setCheckInTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  // 时间戳验证相关状态
+  const [timestampValid, setTimestampValid] = useState(false);
+  const [timestampError, setTimestampError] = useState('');
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [searchParams] = useSearchParams();
+
+  // QR码更新间隔 (5分钟) - 必须与QRCodeGenerator中的值保持一致
+  const QR_UPDATE_INTERVAL = 5 * 60 * 1000; // 5分钟
+
+  // 验证时间戳
+  const validateTimestamp = () => {
+    const timestamp = searchParams.get('t');
+
+    // 严格验证：必须有时间戳参数
+    if (!timestamp || timestamp === '') {
+      setTimestampError(
+        'Invalid QR code. Please scan the current QR code from the business location.'
+      );
+      setTimestampValid(false);
+      return false;
+    }
+
+    // 验证时间戳是否为有效数字
+    const qrTimestamp = parseInt(timestamp);
+    if (isNaN(qrTimestamp)) {
+      setTimestampError(
+        'Invalid QR code format. Please scan the current QR code from the business location.'
+      );
+      setTimestampValid(false);
+      return false;
+    }
+
+    const currentTimestamp = Math.floor(Date.now() / QR_UPDATE_INTERVAL);
+
+    console.log('=== Timestamp Validation Debug ===');
+    console.log('Current time (ms):', Date.now());
+    console.log('QR_UPDATE_INTERVAL (ms):', QR_UPDATE_INTERVAL);
+    console.log('Current timestamp:', currentTimestamp);
+    console.log('QR timestamp:', qrTimestamp);
+    console.log('Timestamp difference:', currentTimestamp - qrTimestamp);
+    console.log('Validation result:', qrTimestamp === currentTimestamp);
+    console.log('==================================');
+
+    // 严格验证：只允许当前时间窗口的QR码
+    if (qrTimestamp === currentTimestamp) {
+      setTimestampValid(true);
+      setTimestampError('');
+      return true;
+    } else {
+      setTimestampError(
+        'QR code has expired. Please scan the current QR code from the business location.'
+      );
+      setTimestampValid(false);
+      return false;
+    }
+  };
+
+  // 组件加载时验证时间戳
+  useEffect(() => {
+    const isValid = validateTimestamp();
+    if (!isValid) {
+      setMessage('QR code validation failed. Please scan the current QR code.');
+      setMessageType('error');
+      // 清除所有用户状态
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setIsCheckedIn(false);
+      setCurrentUser(null);
+      setCheckInTime(null);
+    } else {
+      // 清除之前的错误消息
+      setMessage('');
+    }
+  }, [searchParams]);
 
   // 加载用户信息并检查状态
   useEffect(() => {
+    // 只有在时间戳验证通过后才加载用户信息
+    if (!timestampValid) return;
+
     const savedUserInfo = localStorage.getItem('bbtimer_user_info');
     if (savedUserInfo) {
       try {
@@ -61,7 +140,7 @@ function SelfServicePortal() {
         console.error('Error loading saved user info:', error);
       }
     }
-  }, []);
+  }, [timestampValid]);
 
   // 实时更新当前时间
   useEffect(() => {
@@ -168,6 +247,16 @@ function SelfServicePortal() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 验证时间戳
+    if (!timestampValid) {
+      setMessage(
+        timestampError ||
+          'QR code validation failed. Please scan the current QR code.'
+      );
+      setMessageType('error');
+      return;
+    }
 
     // Validation
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
@@ -428,7 +517,20 @@ function SelfServicePortal() {
         Please enter your information to check in
       </Typography>
 
-      {message && (
+      {/* 时间戳验证错误 */}
+      {!timestampValid && timestampError && (
+        <Alert severity='error' sx={{ mb: 3, borderRadius: 0 }}>
+          <Typography variant='body2'>
+            <strong>QR Code Error:</strong> {timestampError}
+          </Typography>
+          <Typography variant='body2' sx={{ mt: 1 }}>
+            Please scan the current QR code from the business location.
+          </Typography>
+        </Alert>
+      )}
+
+      {/* 其他消息 */}
+      {message && timestampValid && (
         <Alert severity={messageType} sx={{ mb: 3, borderRadius: 0 }}>
           {message}
         </Alert>
@@ -442,7 +544,7 @@ function SelfServicePortal() {
           onChange={(e) => setFirstName(e.target.value)}
           margin='normal'
           required
-          disabled={isLoading}
+          disabled={isLoading || !timestampValid}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 0,
@@ -457,7 +559,7 @@ function SelfServicePortal() {
           onChange={(e) => setLastName(e.target.value)}
           margin='normal'
           required
-          disabled={isLoading}
+          disabled={isLoading || !timestampValid}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 0,
@@ -473,7 +575,7 @@ function SelfServicePortal() {
           onChange={(e) => setEmail(e.target.value)}
           margin='normal'
           required
-          disabled={isLoading}
+          disabled={isLoading || !timestampValid}
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 0,
@@ -486,18 +588,22 @@ function SelfServicePortal() {
           fullWidth
           variant='contained'
           disabled={
-            isLoading || !firstName.trim() || !lastName.trim() || !email.trim()
+            isLoading ||
+            !timestampValid ||
+            !firstName.trim() ||
+            !lastName.trim() ||
+            !email.trim()
           }
           sx={{
             mt: 4,
             py: 1.5,
-            backgroundColor: 'black',
+            backgroundColor: timestampValid ? 'black' : '#e0e0e0',
             borderRadius: 0,
             textTransform: 'none',
             fontSize: '1.1rem',
             fontWeight: 600,
             '&:hover': {
-              backgroundColor: '#333',
+              backgroundColor: timestampValid ? '#333' : '#e0e0e0',
             },
             '&:disabled': {
               backgroundColor: '#e0e0e0',
@@ -505,6 +611,8 @@ function SelfServicePortal() {
           }}>
           {isLoading ? (
             <CircularProgress size={24} sx={{ color: 'white' }} />
+          ) : !timestampValid ? (
+            'QR Code Required'
           ) : (
             'Complete Check-in'
           )}
