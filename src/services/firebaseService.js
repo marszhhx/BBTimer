@@ -79,6 +79,28 @@ export const isCustomerCheckedIn = async (customerId) => {
   }
 };
 
+// Get check-in time for a specific customer
+export const getCustomerCheckInTime = async (customerId) => {
+  try {
+    const today = getTodayVancouver();
+    const dailyRecordRef = doc(db, 'dailyRecords', today);
+    const dailyRecord = await getDoc(dailyRecordRef);
+
+    if (dailyRecord.exists()) {
+      const data = dailyRecord.data();
+      const activeCheckIns = data.activeCheckIns || [];
+      const customerCheckIn = activeCheckIns.find(
+        (checkIn) => checkIn.customerId === customerId
+      );
+      return customerCheckIn ? customerCheckIn.checkInTime : null;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting customer check-in time:', error);
+    return null;
+  }
+};
+
 // Add customer with email and check-in
 export const addCustomerAndCheckIn = async (firstName, lastName, email) => {
   try {

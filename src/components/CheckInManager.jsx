@@ -29,7 +29,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import EditIcon from '@mui/icons-material/Edit';
 
-function CustomerList({
+function CheckInManager({
   customers,
   activeCheckIns,
   onCheckIn,
@@ -507,4 +507,4 @@ function CustomerList({
   );
 }
 
-export default CustomerList;
+export default CheckInManager;

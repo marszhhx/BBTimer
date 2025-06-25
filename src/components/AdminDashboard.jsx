@@ -12,9 +12,9 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { useNavigate } from 'react-router-dom';
-import CustomerList from './CustomerList';
-import CustomerForm from './CustomerForm';
-import Settings from './Settings';
+import CheckInManager from './CheckInManager';
+import NewCustomerDialog from './NewCustomerDialog';
+import SettingsDialog from './SettingsDialog';
 import {
   addCustomer,
   subscribeToCustomers,
@@ -69,7 +69,7 @@ const theme = createTheme({
   },
 });
 
-function MainPage() {
+function AdminDashboard() {
   const [customers, setCustomers] = useState([]);
   const [activeCheckIns, setActiveCheckIns] = useState([]);
   const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false);
@@ -156,7 +156,7 @@ function MainPage() {
             px: { xs: 2, sm: 3, md: 4 },
           }}>
           <Box sx={{ width: '100%' }}>
-            <CustomerList
+            <CheckInManager
               customers={customers}
               activeCheckIns={activeCheckIns}
               onCheckIn={handleCheckIn}
@@ -204,7 +204,7 @@ function MainPage() {
           </IconButton>
         </Tooltip>
 
-        <CustomerForm
+        <NewCustomerDialog
           open={isCustomerFormOpen}
           onClose={() => {
             setIsCustomerFormOpen(false);
@@ -214,7 +214,7 @@ function MainPage() {
           initialName={newCustomerName}
         />
 
-        <Settings
+        <SettingsDialog
           open={isSettingsOpen}
           onClose={() => setIsSettingsOpen(false)}
           maxStayTime={maxStayTime}
@@ -225,4 +225,4 @@ function MainPage() {
   );
 }
 
-export default MainPage;
+export default AdminDashboard;

@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 
-function Settings({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
+function SettingsDialog({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -112,4 +112,4 @@ function Settings({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
   );
 }
 
-export default Settings;
+export default SettingsDialog;

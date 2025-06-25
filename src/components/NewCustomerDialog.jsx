@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 
-function CustomerForm({ open, onClose, onSubmit, initialName = '' }) {
+function NewCustomerDialog({ open, onClose, onSubmit, initialName = '' }) {
   const [name, setName] = useState('');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -108,4 +108,4 @@ function CustomerForm({ open, onClose, onSubmit, initialName = '' }) {
   );
 }
 
-export default CustomerForm;
+export default NewCustomerDialog;

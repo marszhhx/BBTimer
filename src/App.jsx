@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import MainPage from './components/MainPage';
-import CheckInPage from './components/CheckInPage';
+import AdminDashboard from './components/AdminDashboard';
+import SelfServicePortal from './components/SelfServicePortal';
 import QRCodeGenerator from './components/QRCodeGenerator';
 
 // Create a theme instance
@@ -53,8 +53,8 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route path='/' element={<MainPage />} />
-          <Route path='/checkin' element={<CheckInPage />} />
+          <Route path='/' element={<AdminDashboard />} />
+          <Route path='/checkin' element={<SelfServicePortal />} />
           <Route path='/qr' element={<QRCodeGenerator />} />
         </Routes>
       </Router>
