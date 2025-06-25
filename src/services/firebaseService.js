@@ -217,3 +217,60 @@ export const subscribeToSettings = (callback) => {
     }
   });
 };
+
+export const updateCheckInTime = async (date, customerId, newCheckInTime) => {
+  try {
+    console.log(
+      'Updating check-in time for customer:',
+      customerId,
+      'on date (Vancouver):',
+      date,
+      'new time:',
+      newCheckInTime
+    );
+
+    const dailyRecordRef = doc(db, 'dailyRecords', date);
+    console.log('Document reference:', dailyRecordRef.path);
+
+    const dailyRecord = await getDoc(dailyRecordRef);
+    console.log('Daily record exists:', dailyRecord.exists());
+
+    if (dailyRecord.exists()) {
+      const data = dailyRecord.data();
+      console.log('Current document data:', data);
+
+      const activeCheckIns = data.activeCheckIns || [];
+      console.log('Current active check-ins:', activeCheckIns);
+
+      // 找到并更新指定客户的check-in时间
+      const updatedCheckIns = activeCheckIns.map((checkIn) => {
+        if (checkIn.customerId === customerId) {
+          return {
+            ...checkIn,
+            checkInTime: newCheckInTime,
+          };
+        }
+        return checkIn;
+      });
+
+      console.log('Updated check-ins:', updatedCheckIns);
+
+      await setDoc(
+        dailyRecordRef,
+        {
+          ...data,
+          activeCheckIns: updatedCheckIns,
+        },
+        { merge: true }
+      );
+
+      console.log('Check-in time update successful');
+    } else {
+      console.error('Daily record not found for date:', date);
+      throw new Error('Daily record not found');
+    }
+  } catch (error) {
+    console.error('Error in updateCheckInTime:', error);
+    throw error;
+  }
+};

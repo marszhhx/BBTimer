@@ -24,6 +24,7 @@ import {
   subscribeToActiveCheckIns,
   updateSettings,
   subscribeToSettings,
+  updateCheckInTime,
 } from './services/firebaseService';
 
 // Create a theme instance
@@ -41,25 +42,14 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-    },
-    h2: {
-      fontWeight: 600,
-    },
-    h3: {
-      fontWeight: 600,
-    },
-    h4: {
-      fontWeight: 500,
-    },
-    h5: {
-      fontWeight: 500,
-    },
-    h6: {
-      fontWeight: 500,
-    },
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 600 },
+    h3: { fontWeight: 600 },
+    h4: { fontWeight: 500 },
+    h5: { fontWeight: 500 },
+    h6: { fontWeight: 500 },
+    button: { fontWeight: 700, letterSpacing: 1 },
   },
   components: {
     MuiButton: {
@@ -128,6 +118,10 @@ function App() {
     await updateCheckOut(checkIn.date, checkIn.customerId);
   };
 
+  const handleUpdateCheckInTime = async (checkIn, newCheckInTime) => {
+    await updateCheckInTime(checkIn.date, checkIn.customerId, newCheckInTime);
+  };
+
   const handleRegisterNewCustomer = async (name) => {
     const newCustomer = await handleAddCustomer(name);
     await handleCheckIn(newCustomer.id);
@@ -168,6 +162,7 @@ function App() {
               activeCheckIns={activeCheckIns}
               onCheckIn={handleCheckIn}
               onCheckOut={handleCheckOut}
+              onUpdateCheckInTime={handleUpdateCheckInTime}
               onRegisterNewCustomer={handleRegisterNewCustomer}
               maxStayTime={maxStayTime}
             />

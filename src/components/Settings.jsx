@@ -61,13 +61,15 @@ function Settings({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
       <DialogTitle
         sx={{
           pb: 2,
-          borderBottom: '1px solid #e0e0e0',
+          borderBottom: 'none',
         }}>
         Settings
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant='subtitle1' sx={{ mb: 1, fontWeight: 500 }}>
+        <Box sx={{ mb: 3, mt: 2, borderBottom: 'none', borderTop: 'none' }}>
+          <Typography
+            variant='subtitle1'
+            sx={{ mb: 1, fontWeight: 500, mt: 1.5 }}>
             Maximum Stay Time
           </Typography>
           <TextField
@@ -92,7 +94,7 @@ function Settings({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
         sx={{
           px: 3,
           py: 2,
-          borderTop: '1px solid #e0e0e0',
+          borderTop: 'none',
         }}>
         <Button
           onClick={onClose}
