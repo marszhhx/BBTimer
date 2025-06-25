@@ -440,8 +440,12 @@ function CheckInManager({
                   }}>
                   <ListItemText
                     primary={customer.name}
+                    secondary={customer.email}
                     primaryTypographyProps={{
                       fontWeight: 500,
+                    }}
+                    secondaryTypographyProps={{
+                      color: 'text.secondary',
                     }}
                   />
                 </ListItemButton>
