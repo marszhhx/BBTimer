@@ -37,13 +37,7 @@ function NewCustomerDialog({ open, onClose, onSubmit, initialName = '' }) {
       onClose={onClose}
       maxWidth='sm'
       fullWidth
-      fullScreen={isMobile}
-      PaperProps={{
-        sx: {
-          borderRadius: 0,
-          border: '1px solid #e0e0e0',
-        },
-      }}>
+      fullScreen={isMobile}>
       <DialogTitle
         sx={{
           pb: 2,

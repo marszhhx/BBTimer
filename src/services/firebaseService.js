@@ -36,10 +36,12 @@ export const addCustomer = async (name, email = null) => {
 export const subscribeToCustomers = (callback) => {
   const q = query(collection(db, CUSTOMERS_COLLECTION));
   return onSnapshot(q, (snapshot) => {
-    const customers = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const customers = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((customer) => !customer.isDeleted);
     callback(customers);
   });
 };
@@ -394,6 +396,42 @@ export const updateCheckInTime = async (date, customerId, newCheckInTime) => {
     }
   } catch (error) {
     console.error('Error in updateCheckInTime:', error);
+    throw error;
+  }
+};
+
+// Update customer information
+export const updateCustomer = async (customerId, updateData) => {
+  try {
+    const customerRef = doc(db, CUSTOMERS_COLLECTION, customerId);
+    await setDoc(
+      customerRef,
+      {
+        ...updateData,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    throw error;
+  }
+};
+
+// Delete customer
+export const deleteCustomer = async (customerId) => {
+  try {
+    const customerRef = doc(db, CUSTOMERS_COLLECTION, customerId);
+    await setDoc(
+      customerRef,
+      {
+        deletedAt: serverTimestamp(),
+        isDeleted: true,
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error('Error deleting customer:', error);
     throw error;
   }
 };

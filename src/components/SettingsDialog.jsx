@@ -54,23 +54,7 @@ function SettingsDialog({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
       onClose={onClose}
       maxWidth='sm'
       fullWidth
-      fullScreen={isMobile}
-      PaperProps={{
-        sx: {
-          borderRadius: 0,
-          border: '1px solid #e0e0e0',
-          margin: 0,
-          position: 'absolute',
-          top: { xs: '20px', sm: '30px', md: '40px' },
-          left: '50%',
-          transform: 'translateX(-50%)',
-          maxHeight: 'calc(100vh - 100px)',
-          '@media (max-height: 600px)': {
-            top: '10px',
-            maxHeight: 'calc(100vh - 50px)',
-          },
-        },
-      }}>
+      fullScreen={isMobile}>
       <DialogTitle
         sx={{
           pb: 2,

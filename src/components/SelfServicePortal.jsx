@@ -23,6 +23,7 @@ import {
   updateCheckOut,
   checkCustomerByEmail,
   getCustomerCheckInTime,
+  subscribeToSettings,
 } from '../services/firebaseService';
 import moment from 'moment-timezone';
 
@@ -41,6 +42,8 @@ function SelfServicePortal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [checkInTime, setCheckInTime] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [maxStayTime, setMaxStayTime] = useState(3600); // Default 60 minutes in seconds
+  const [isOvertime, setIsOvertime] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -61,6 +64,19 @@ function SelfServicePortal() {
         console.error('Error loading saved user info:', error);
       }
     }
+  }, []);
+
+  // 订阅设置以获取最大停留时间
+  useEffect(() => {
+    const unsubscribeSettings = subscribeToSettings((settings) => {
+      if (settings.maxStayTime) {
+        setMaxStayTime(settings.maxStayTime);
+      }
+    });
+
+    return () => {
+      unsubscribeSettings();
+    };
   }, []);
 
   // 实时更新当前时间
@@ -122,6 +138,24 @@ function SelfServicePortal() {
     const seconds = duration.seconds();
     return `${hours}h ${minutes}m ${seconds}s`;
   };
+
+  // 检查是否超时
+  const checkOvertime = () => {
+    if (!checkInTime) return false;
+    const duration = moment.duration(currentTime - new Date(checkInTime));
+    const totalSeconds = duration.asSeconds();
+    return totalSeconds > maxStayTime;
+  };
+
+  // 更新超时状态
+  useEffect(() => {
+    if (isCheckedIn && checkInTime) {
+      const overtime = checkOvertime();
+      setIsOvertime(overtime);
+    } else {
+      setIsOvertime(false);
+    }
+  }, [currentTime, checkInTime, isCheckedIn, maxStayTime]);
 
   // Check-out处理
   const handleCheckOut = async () => {
@@ -351,37 +385,76 @@ function SelfServicePortal() {
   const renderCheckOutView = () => (
     <Box>
       <Typography
-        variant='h4'
+        variant='h5'
         component='h1'
         gutterBottom
-        sx={{ textAlign: 'center', fontWeight: 700, mb: 3 }}>
-        Welcome Back, {currentUser?.name}!
+        sx={{
+          textAlign: 'center',
+          fontWeight: 600,
+          mb: 2,
+          color: isOvertime ? '#d32f2f' : 'inherit',
+        }}>
+        {currentUser?.name}
       </Typography>
 
-      <Typography
-        variant='body1'
-        sx={{ textAlign: 'center', color: 'text.secondary', mb: 4 }}>
-        You are currently checked in
-      </Typography>
+      {isOvertime ? (
+        <Alert
+          severity='warning'
+          sx={{
+            mb: 3,
+            borderRadius: 0,
+            backgroundColor: '#fff3e0',
+            border: '1px solid #ff9800',
+            '& .MuiAlert-icon': {
+              color: '#f57c00',
+            },
+          }}>
+          <Typography variant='body2' sx={{ fontWeight: 500 }}>
+            You have exceeded the allowed {Math.floor(maxStayTime / 60)}{' '}
+            minutes. Please check out.
+          </Typography>
+        </Alert>
+      ) : (
+        <Alert
+          severity='success'
+          sx={{
+            mb: 3,
+            borderRadius: 0,
+            backgroundColor: '#f1f8e9',
+            border: '1px solid #4caf50',
+            '& .MuiAlert-icon': {
+              color: '#2e7d32',
+            },
+          }}>
+          <Typography variant='body2' sx={{ fontWeight: 500 }}>
+            Successfully checked in. You can stay for up to{' '}
+            {Math.floor(maxStayTime / 60)} minutes.
+          </Typography>
+        </Alert>
+      )}
 
-      <Paper
-        elevation={0}
-        sx={{ p: 3, mb: 3, border: '1px solid #e0e0e0', borderRadius: 0 }}>
-        <Typography variant='h6' sx={{ mb: 2, fontWeight: 600 }}>
-          Check-in Information
+      <Box
+        sx={{
+          mb: 3,
+          p: 2,
+          border: isOvertime ? '1px solid #d32f2f' : '1px solid #e0e0e0',
+          backgroundColor: isOvertime ? '#fff5f5' : '#fafafa',
+          textAlign: 'center',
+        }}>
+        <Typography variant='body2' color='text.secondary' sx={{ mb: 1 }}>
+          Check-in:{' '}
+          {checkInTime ? moment(checkInTime).format('HH:mm:ss') : 'N/A'}
         </Typography>
-        <Box sx={{ mb: 2 }}>
-          <Typography variant='body2' color='text.secondary'>
-            Check-in Time:{' '}
-            {checkInTime
-              ? moment(checkInTime).format('MMM DD, YYYY HH:mm:ss')
-              : 'N/A'}
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Duration: {getStayDuration()}
-          </Typography>
-        </Box>
-      </Paper>
+        <Typography
+          variant='h6'
+          sx={{
+            color: isOvertime ? '#d32f2f' : 'text.primary',
+            fontWeight: 600,
+          }}>
+          {getStayDuration()}
+          {isOvertime && ' (OVERTIME)'}
+        </Typography>
+      </Box>
 
       <Button
         fullWidth
@@ -389,21 +462,35 @@ function SelfServicePortal() {
         onClick={handleCheckOut}
         disabled={isLoading}
         sx={{
-          py: 1.5,
-          backgroundColor: '#d32f2f',
+          py: 2,
+          backgroundColor: isOvertime ? '#d32f2f' : '#1976d2',
           borderRadius: 0,
           textTransform: 'none',
           fontSize: '1.1rem',
           fontWeight: 600,
           '&:hover': {
-            backgroundColor: '#b71c1c',
+            backgroundColor: isOvertime ? '#b71c1c' : '#1565c0',
           },
           '&:disabled': {
             backgroundColor: '#e0e0e0',
           },
+          animation: isOvertime ? 'pulse 2s infinite' : 'none',
+          '@keyframes pulse': {
+            '0%': {
+              boxShadow: '0 0 0 0 rgba(211, 47, 47, 0.7)',
+            },
+            '70%': {
+              boxShadow: '0 0 0 10px rgba(211, 47, 47, 0)',
+            },
+            '100%': {
+              boxShadow: '0 0 0 0 rgba(211, 47, 47, 0)',
+            },
+          },
         }}>
         {isLoading ? (
           <CircularProgress size={24} sx={{ color: 'white' }} />
+        ) : isOvertime ? (
+          'Check Out Now'
         ) : (
           'Check Out'
         )}
@@ -528,8 +615,10 @@ function SelfServicePortal() {
           sx={{
             p: isMobile ? 3 : 4,
             width: '100%',
-            border: '1px solid #e0e0e0',
+            border: isOvertime ? '2px solid #d32f2f' : '1px solid #e0e0e0',
             borderRadius: 0,
+            backgroundColor: isOvertime ? '#fff5f5' : 'inherit',
+            transition: 'all 0.3s ease',
           }}>
           {isCheckedIn ? renderCheckOutView() : renderCheckInView()}
         </Paper>

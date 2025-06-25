@@ -1,0 +1,56 @@
+/* Cursor Rules for Consistent Dialog Styling */
+
+/* Make all Material-UI dialogs consistent with check-in window */
+.MuiDialog-root .MuiDialog-paper {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  position: absolute !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  max-height: calc(100vh - 100px) !important;
+  max-width: 600px !important; /* sm breakpoint width */
+  width: 100% !important;
+}
+
+/* Responsive positioning for different screen sizes */
+@media (min-width: 600px) {
+  .MuiDialog-root .MuiDialog-paper {
+    top: 30px !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .MuiDialog-root .MuiDialog-paper {
+    top: 40px !important;
+  }
+}
+
+/* Handle small screen heights */
+@media (max-height: 600px) {
+  .MuiDialog-root .MuiDialog-paper {
+    top: 10px !important;
+    max-height: calc(100vh - 50px) !important;
+  }
+}
+
+/* Ensure dialogs don't exceed screen width on mobile */
+@media (max-width: 600px) {
+  .MuiDialog-root .MuiDialog-paper {
+    width: calc(100vw - 32px) !important;
+    margin: 0 16px !important;
+    left: 0 !important;
+    transform: none !important;
+  }
+}
+
+/* Override any existing dialog positioning */
+.MuiDialog-root[style*="position"] .MuiDialog-paper {
+  position: absolute !important;
+}
+
+/* Ensure consistent border radius */
+.MuiDialog-root .MuiDialog-paper,
+.MuiDialog-root .MuiDialog-paper * {
+  border-radius: 0 !important;
+} 

@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import AdminDashboard from './components/AdminDashboard';
 import SelfServicePortal from './components/SelfServicePortal';
 import QRCodeGenerator from './components/QRCodeGenerator';
+import './cursor-rules.css';
 
 // Create a theme instance
 const theme = createTheme({

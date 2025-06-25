@@ -12,10 +12,12 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import CasinoIcon from '@mui/icons-material/Casino';
+import PeopleIcon from '@mui/icons-material/People';
 import CheckInManager from './CheckInManager';
 import NewCustomerDialog from './NewCustomerDialog';
 import SettingsDialog from './SettingsDialog';
 import LotteryDialog from './LotteryDialog';
+import CustomerManagementDialog from './CustomerManagementDialog';
 import {
   addCustomer,
   subscribeToCustomers,
@@ -76,6 +78,8 @@ function AdminDashboard() {
   const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLotteryOpen, setIsLotteryOpen] = useState(false);
+  const [isCustomerManagementOpen, setIsCustomerManagementOpen] =
+    useState(false);
   const [maxStayTime, setMaxStayTime] = useState(3600); // 60 minutes (in seconds)
   const [newCustomerName, setNewCustomerName] = useState('');
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -183,7 +187,7 @@ function AdminDashboard() {
             sx={{
               position: 'fixed',
               bottom: 16,
-              right: isMobile ? 80 : 80,
+              right: isMobile ? 144 : 144,
               backgroundColor: 'background.paper',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               '&:hover': {
@@ -191,6 +195,24 @@ function AdminDashboard() {
               },
             }}>
             <QrCodeIcon />
+          </IconButton>
+        </Tooltip>
+
+        {/* Customer Management Button */}
+        <Tooltip title='Customer Management'>
+          <IconButton
+            onClick={() => setIsCustomerManagementOpen(true)}
+            sx={{
+              position: 'fixed',
+              bottom: 16,
+              right: isMobile ? 80 : 80,
+              backgroundColor: 'background.paper',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              '&:hover': {
+                backgroundColor: 'background.paper',
+              },
+            }}>
+            <PeopleIcon />
           </IconButton>
         </Tooltip>
 
@@ -233,6 +255,12 @@ function AdminDashboard() {
           open={isLotteryOpen}
           onClose={() => setIsLotteryOpen(false)}
           activeCustomers={activeCustomers}
+        />
+
+        <CustomerManagementDialog
+          open={isCustomerManagementOpen}
+          onClose={() => setIsCustomerManagementOpen(false)}
+          customers={customers}
         />
       </Box>
     </ThemeProvider>
