@@ -3,14 +3,18 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBfnFnqLwLxPYDTpAaUQxI0vBaeHFM9uzA',
-  authDomain: 'bbtimer.firebaseapp.com',
-  projectId: 'bbtimer',
-  storageBucket: 'bbtimer.firebasestorage.app',
-  messagingSenderId: '1016421887345',
-  appId: '1:1016421887345:web:8d407726c73b6df475dad0',
-  measurementId: 'G-BJNVP39707',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+
+// 添加环境标识到控制台
+console.log('Firebase Environment:', import.meta.env.MODE);
+console.log('Firebase Project ID:', firebaseConfig.projectId);
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);

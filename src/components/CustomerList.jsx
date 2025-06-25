@@ -290,6 +290,16 @@ function CustomerList({
         PaperProps={{
           sx: {
             borderRadius: 0,
+            margin: 0,
+            position: 'absolute',
+            top: { xs: '20px', sm: '30px', md: '40px' },
+            left: '50%',
+            transform: 'translateX(-50%)',
+            maxHeight: 'calc(100vh - 100px)',
+            '@media (max-height: 600px)': {
+              top: '10px',
+              maxHeight: 'calc(100vh - 50px)',
+            },
           },
         }}>
         <DialogTitle>Check In Customer</DialogTitle>
