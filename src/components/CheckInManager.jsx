@@ -28,6 +28,7 @@ import moment from 'moment-timezone';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import EditIcon from '@mui/icons-material/Edit';
+import CasinoIcon from '@mui/icons-material/Casino';
 
 function CheckInManager({
   customers,
@@ -37,6 +38,8 @@ function CheckInManager({
   onUpdateCheckInTime,
   onRegisterNewCustomer,
   maxStayTime,
+  onLotteryClick,
+  activeCustomers,
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -74,10 +77,6 @@ function CheckInManager({
     const seconds = Math.floor((currentTime - new Date(startTime)) / 1000) % 60;
     return `${hours}h ${remainingMinutes}m ${seconds}s`;
   };
-
-  const activeCustomers = customers.filter((customer) =>
-    getActiveCheckIn(customer.id)
-  );
 
   const filteredCustomers = customers.filter((customer) =>
     customer.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -169,30 +168,68 @@ function CheckInManager({
           }}>
           {formatCurrentDateTime()}
         </Typography>
-        <Button
-          variant='contained'
-          onClick={handleCheckInClick}
-          size={isMobile ? 'medium' : 'large'}
-          startIcon={<LoginIcon sx={{ color: '#fff' }} />}
+        <Box
           sx={{
-            backgroundColor: '#1976d2',
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: isMobile ? '0.95rem' : '1.1rem',
-            borderRadius: 8,
-            boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
-            padding: isMobile ? '8px 16px' : '12px 24px',
-            transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
-            '&:hover': {
-              backgroundColor: '#1565c0',
-              boxShadow: '0 4px 16px 0 rgba(25, 118, 210, 0.13)',
-            },
-            '&:active': {
-              transform: 'scale(0.98)',
-            },
+            display: 'flex',
+            gap: 2,
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: 'center',
           }}>
-          CHECK IN
-        </Button>
+          <Button
+            variant='contained'
+            onClick={handleCheckInClick}
+            size={isMobile ? 'medium' : 'large'}
+            startIcon={<LoginIcon sx={{ color: '#fff' }} />}
+            sx={{
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: isMobile ? '0.95rem' : '1.1rem',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
+              padding: isMobile ? '8px 16px' : '12px 24px',
+              transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
+              '&:hover': {
+                backgroundColor: '#1565c0',
+                boxShadow: '0 4px 16px 0 rgba(25, 118, 210, 0.13)',
+              },
+              '&:active': {
+                transform: 'scale(0.98)',
+              },
+            }}>
+            CHECK IN
+          </Button>
+          <Button
+            variant='contained'
+            onClick={onLotteryClick}
+            disabled={!activeCustomers || activeCustomers.length === 0}
+            size={isMobile ? 'medium' : 'large'}
+            startIcon={<CasinoIcon sx={{ color: '#fff' }} />}
+            sx={{
+              backgroundColor: '#ff6b35',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: isMobile ? '0.95rem' : '1.1rem',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px 0 rgba(255, 107, 53, 0.08)',
+              padding: isMobile ? '8px 16px' : '12px 24px',
+              transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
+              '&:hover': {
+                backgroundColor: '#e55a2b',
+                boxShadow: '0 4px 16px 0 rgba(255, 107, 53, 0.13)',
+              },
+              '&:active': {
+                transform: 'scale(0.98)',
+              },
+              '&:disabled': {
+                backgroundColor: '#e0e0e0',
+                color: '#ccc',
+                boxShadow: 'none',
+              },
+            }}>
+            LOTTERY
+          </Button>
+        </Box>
       </Box>
 
       <Box
@@ -355,7 +392,12 @@ function CheckInManager({
             },
           },
         }}>
-        <DialogTitle>Check In Customer</DialogTitle>
+        <DialogTitle sx={{ pb: 2, borderBottom: '1px solid #e0e0e0' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <LoginIcon />
+            <Typography variant='h6'>CHECK IN</Typography>
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -384,9 +426,8 @@ function CheckInManager({
                 key={customer.id}
                 disablePadding
                 sx={{
-                  borderBottom: '1px solid #e0e0e0',
-                  '&:last-child': {
-                    borderBottom: 'none',
+                  '&:hover': {
+                    backgroundColor: '#f8f8f8',
                   },
                 }}>
                 <ListItemButton
@@ -408,7 +449,7 @@ function CheckInManager({
             ))}
           </List>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}>
           <Button
             onClick={() => {
               setIsSearchOpen(false);
@@ -451,7 +492,12 @@ function CheckInManager({
             },
           },
         }}>
-        <DialogTitle>Edit Check-in Time</DialogTitle>
+        <DialogTitle sx={{ pb: 2, borderBottom: '1px solid #e0e0e0' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <EditIcon />
+            <Typography variant='h6'>Edit Check-in Time</Typography>
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -478,7 +524,7 @@ function CheckInManager({
               : ''}
           </Typography>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}>
           <Button
             onClick={() => {
               setIsEditDialogOpen(false);

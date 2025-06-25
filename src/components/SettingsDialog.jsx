@@ -9,8 +9,11 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
+  Tooltip,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
+import SettingsIcon from '@mui/icons-material/Settings';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 function SettingsDialog({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
   const theme = useTheme();
@@ -56,14 +59,27 @@ function SettingsDialog({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
         sx: {
           borderRadius: 0,
           border: '1px solid #e0e0e0',
+          margin: 0,
+          position: 'absolute',
+          top: { xs: '20px', sm: '30px', md: '40px' },
+          left: '50%',
+          transform: 'translateX(-50%)',
+          maxHeight: 'calc(100vh - 100px)',
+          '@media (max-height: 600px)': {
+            top: '10px',
+            maxHeight: 'calc(100vh - 50px)',
+          },
         },
       }}>
       <DialogTitle
         sx={{
           pb: 2,
-          borderBottom: 'none',
+          borderBottom: '1px solid #e0e0e0',
         }}>
-        Settings
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <SettingsIcon />
+          <Typography variant='h6'>SETTINGS</Typography>
+        </Box>
       </DialogTitle>
       <DialogContent sx={{ pt: 3 }}>
         <Box sx={{ mb: 3, mt: 2, borderBottom: 'none', borderTop: 'none' }}>
@@ -72,29 +88,32 @@ function SettingsDialog({ open, onClose, maxStayTime, onMaxStayTimeChange }) {
             sx={{ mb: 1, fontWeight: 500, mt: 1.5 }}>
             Maximum Stay Time
           </Typography>
-          <TextField
-            fullWidth
-            label='Minutes'
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 0,
-              },
-            }}
-          />
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
-            Set the maximum duration (in minutes) a customer can stay before
-            being marked as overtime.
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TextField
+              fullWidth
+              label='Minutes'
+              value={inputValue}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 0,
+                },
+              }}
+            />
+            <Tooltip title='Set the maximum duration (in minutes) a customer can stay before being marked as overtime.'>
+              <HelpOutlineIcon
+                sx={{ color: 'text.secondary', cursor: 'help' }}
+              />
+            </Tooltip>
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions
         sx={{
           px: 3,
           py: 2,
-          borderTop: 'none',
+          borderTop: '1px solid #e0e0e0',
         }}>
         <Button
           onClick={onClose}

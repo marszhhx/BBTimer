@@ -11,10 +11,11 @@ import {
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QrCodeIcon from '@mui/icons-material/QrCode';
-import { useNavigate } from 'react-router-dom';
+import CasinoIcon from '@mui/icons-material/Casino';
 import CheckInManager from './CheckInManager';
 import NewCustomerDialog from './NewCustomerDialog';
 import SettingsDialog from './SettingsDialog';
+import LotteryDialog from './LotteryDialog';
 import {
   addCustomer,
   subscribeToCustomers,
@@ -74,10 +75,10 @@ function AdminDashboard() {
   const [activeCheckIns, setActiveCheckIns] = useState([]);
   const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLotteryOpen, setIsLotteryOpen] = useState(false);
   const [maxStayTime, setMaxStayTime] = useState(3600); // 60 minutes (in seconds)
   const [newCustomerName, setNewCustomerName] = useState('');
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const navigate = useNavigate();
 
   // Subscribe to Firebase data
   useEffect(() => {
@@ -96,6 +97,11 @@ function AdminDashboard() {
       unsubscribeSettings();
     };
   }, []);
+
+  // 获取当前check-in的客户列表
+  const activeCustomers = customers.filter((customer) =>
+    activeCheckIns.some((checkIn) => checkIn.customerId === customer.id)
+  );
 
   const capitalizeWords = (str) => {
     return str
@@ -164,6 +170,8 @@ function AdminDashboard() {
               onUpdateCheckInTime={handleUpdateCheckInTime}
               onRegisterNewCustomer={handleRegisterNewCustomer}
               maxStayTime={maxStayTime}
+              onLotteryClick={() => setIsLotteryOpen(true)}
+              activeCustomers={activeCustomers}
             />
           </Box>
         </Container>
@@ -171,7 +179,7 @@ function AdminDashboard() {
         {/* QR Code Button */}
         <Tooltip title='Generate QR Code'>
           <IconButton
-            onClick={() => navigate('/qr')}
+            onClick={() => window.open('/qr', '_blank')}
             sx={{
               position: 'fixed',
               bottom: 16,
@@ -219,6 +227,12 @@ function AdminDashboard() {
           onClose={() => setIsSettingsOpen(false)}
           maxStayTime={maxStayTime}
           onMaxStayTimeChange={handleMaxStayTimeChange}
+        />
+
+        <LotteryDialog
+          open={isLotteryOpen}
+          onClose={() => setIsLotteryOpen(false)}
+          activeCustomers={activeCustomers}
         />
       </Box>
     </ThemeProvider>
