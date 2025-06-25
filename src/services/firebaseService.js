@@ -7,6 +7,8 @@ import {
   serverTimestamp,
   getDoc,
   setDoc,
+  getDocs,
+  where,
 } from 'firebase/firestore';
 import {
   db,
@@ -22,12 +24,13 @@ const getTodayVancouver = () => {
 };
 
 // Customers
-export const addCustomer = async (name) => {
+export const addCustomer = async (name, email = null) => {
   const docRef = await addDoc(collection(db, CUSTOMERS_COLLECTION), {
     name,
+    email,
     createdAt: serverTimestamp(),
   });
-  return { id: docRef.id, name };
+  return { id: docRef.id, name, email };
 };
 
 export const subscribeToCustomers = (callback) => {
@@ -39,6 +42,104 @@ export const subscribeToCustomers = (callback) => {
     }));
     callback(customers);
   });
+};
+
+// Check if customer exists by email
+export const checkCustomerByEmail = async (email) => {
+  const q = query(
+    collection(db, CUSTOMERS_COLLECTION),
+    where('email', '==', email)
+  );
+  const querySnapshot = await getDocs(q);
+  if (!querySnapshot.empty) {
+    const doc = querySnapshot.docs[0];
+    return { id: doc.id, ...doc.data() };
+  }
+  return null;
+};
+
+// Check if customer is already checked in today
+export const isCustomerCheckedIn = async (customerId) => {
+  try {
+    const today = getTodayVancouver();
+    const dailyRecordRef = doc(db, 'dailyRecords', today);
+    const dailyRecord = await getDoc(dailyRecordRef);
+
+    if (dailyRecord.exists()) {
+      const data = dailyRecord.data();
+      const activeCheckIns = data.activeCheckIns || [];
+      return activeCheckIns.some(
+        (checkIn) => checkIn.customerId === customerId
+      );
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking if customer is checked in:', error);
+    return false;
+  }
+};
+
+// Add customer with email and check-in
+export const addCustomerAndCheckIn = async (firstName, lastName, email) => {
+  try {
+    // Check if customer already exists
+    const existingCustomer = await checkCustomerByEmail(email);
+    if (existingCustomer) {
+      // Check if names match
+      const inputFullName = `${firstName} ${lastName}`.trim();
+      const existingFullName = existingCustomer.name;
+
+      if (inputFullName.toLowerCase() === existingFullName.toLowerCase()) {
+        // Names match, check if already checked in
+        const isAlreadyCheckedIn = await isCustomerCheckedIn(
+          existingCustomer.id
+        );
+        if (isAlreadyCheckedIn) {
+          return {
+            success: false,
+            customer: existingCustomer,
+            alreadyCheckedIn: true,
+          };
+        }
+
+        // Not checked in, proceed with check-in
+        await addCheckIn(existingCustomer.id);
+        return { success: true, customer: existingCustomer, isNew: false };
+      } else {
+        // Names don't match, check if existing customer is already checked in
+        const isAlreadyCheckedIn = await isCustomerCheckedIn(
+          existingCustomer.id
+        );
+        if (isAlreadyCheckedIn) {
+          return {
+            success: false,
+            customer: existingCustomer,
+            alreadyCheckedIn: true,
+          };
+        }
+
+        // Names don't match, return existing customer info for confirmation
+        return {
+          success: false,
+          existingCustomer,
+          inputName: inputFullName,
+          needsConfirmation: true,
+        };
+      }
+    }
+
+    // Create new customer
+    const fullName = `${firstName} ${lastName}`.trim();
+    const newCustomer = await addCustomer(fullName, email);
+
+    // Check them in
+    await addCheckIn(newCustomer.id);
+
+    return { success: true, customer: newCustomer, isNew: true };
+  } catch (error) {
+    console.error('Error in addCustomerAndCheckIn:', error);
+    throw error;
+  }
 };
 
 // Check-ins

@@ -1,0 +1,42 @@
+# BB Timer - Cursor Rules
+
+## Language Requirements
+- **All user-facing text must be in English**
+- This includes but is not limited to:
+  - Button labels
+  - Form field labels
+  - Error messages
+  - Success messages
+  - Dialog titles and content
+  - Tooltips
+  - Page titles and headings
+  - Helper text
+  - Alert messages
+
+## UI/UX Guidelines
+- Maintain consistent English terminology throughout the application
+- Use clear, professional English language
+- Follow Material-UI design patterns
+- Keep text concise and user-friendly
+- Use proper capitalization for UI elements
+
+## Code Style
+- Use English for all string literals in components
+- Use English for variable names and comments
+- Use English for function names and parameters
+- Maintain consistent naming conventions
+
+## Examples of Required English Text
+- "Check In" instead of "签到"
+- "Settings" instead of "设置"
+- "Customer Name" instead of "客户姓名"
+- "Email Address" instead of "邮箱地址"
+- "Complete Check-in" instead of "完成签到"
+- "Download QR Code" instead of "下载二维码"
+- "Welcome to Check-in" instead of "欢迎签到"
+
+## File Structure
+- All React components should use English text
+- All error messages should be in English
+- All success messages should be in English
+- All form validations should display English messages
