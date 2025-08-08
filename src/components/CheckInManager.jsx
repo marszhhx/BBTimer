@@ -150,7 +150,7 @@ function CheckInManager({
       <Box
         sx={{
           position: 'fixed',
-          top: { xs: '20px', sm: '30px', md: '40px' },
+          top: { xs: '10px', sm: '15px', md: '20px' },
           left: 0,
           right: 0,
           zIndex: 90,
@@ -174,23 +174,27 @@ function CheckInManager({
         <Box
           sx={{
             display: 'flex',
-            gap: 2,
-            flexDirection: isMobile ? 'column' : 'row',
+            gap: { xs: 1, sm: 2 },
+            flexDirection: 'row',
             alignItems: 'center',
           }}>
           <Button
             variant='contained'
             onClick={handleCheckInClick}
-            size={isMobile ? 'medium' : 'large'}
-            startIcon={<LoginIcon sx={{ color: '#fff' }} />}
+            size={isMobile ? 'small' : 'large'}
+            startIcon={
+              <LoginIcon
+                sx={{ color: '#fff', fontSize: isMobile ? '1rem' : '1.2rem' }}
+              />
+            }
             sx={{
               backgroundColor: '#1976d2',
               color: '#fff',
               fontWeight: 700,
-              fontSize: isMobile ? '0.95rem' : '1.1rem',
+              fontSize: isMobile ? '0.75rem' : '1.1rem',
               borderRadius: 8,
               boxShadow: '0 2px 8px 0 rgba(25, 118, 210, 0.08)',
-              padding: isMobile ? '8px 16px' : '12px 24px',
+              padding: isMobile ? '6px 12px' : '12px 24px',
               transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
               '&:hover': {
                 backgroundColor: '#1565c0',
@@ -206,16 +210,20 @@ function CheckInManager({
             variant='contained'
             onClick={onLotteryClick}
             disabled={!activeCustomers || activeCustomers.length === 0}
-            size={isMobile ? 'medium' : 'large'}
-            startIcon={<CasinoIcon sx={{ color: '#fff' }} />}
+            size={isMobile ? 'small' : 'large'}
+            startIcon={
+              <CasinoIcon
+                sx={{ color: '#fff', fontSize: isMobile ? '1rem' : '1.2rem' }}
+              />
+            }
             sx={{
               backgroundColor: '#ff6b35',
               color: '#fff',
               fontWeight: 700,
-              fontSize: isMobile ? '0.95rem' : '1.1rem',
+              fontSize: isMobile ? '0.75rem' : '1.1rem',
               borderRadius: 8,
               boxShadow: '0 2px 8px 0 rgba(255, 107, 53, 0.08)',
-              padding: isMobile ? '8px 16px' : '12px 24px',
+              padding: isMobile ? '6px 12px' : '12px 24px',
               transition: 'all 0.2s cubic-bezier(.4,2,.6,1)',
               '&:hover': {
                 backgroundColor: '#e55a2b',
@@ -240,7 +248,7 @@ function CheckInManager({
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
-          mt: { xs: '105px', sm: '125px', md: '145px' },
+          mt: { xs: '120px', sm: '140px', md: '160px' },
         }}>
         {activeCustomers.length === 0 ? (
           <Box sx={{ height: 200 }} />
@@ -253,134 +261,165 @@ function CheckInManager({
                 maxWidth: '100%',
                 width: '100%',
                 px: { xs: 2, sm: 3, md: 4 },
-                justifyContent: 'flex-start',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-              {activeCustomers.map((customer) => {
-                const activeCheckIn = getActiveCheckIn(customer.id);
-                const isOverTime =
-                  activeCheckIn &&
-                  Math.floor(
-                    (currentTime - new Date(activeCheckIn.checkInTime)) / 1000
-                  ) > maxStayTime;
+              {activeCustomers
+                .sort((a, b) => {
+                  const checkInA = getActiveCheckIn(a.id);
+                  const checkInB = getActiveCheckIn(b.id);
+                  if (!checkInA || !checkInB) return 0;
+                  return (
+                    new Date(checkInA.checkInTime) -
+                    new Date(checkInB.checkInTime)
+                  );
+                })
+                .map((customer) => {
+                  const activeCheckIn = getActiveCheckIn(customer.id);
+                  const isOverTime =
+                    activeCheckIn &&
+                    Math.floor(
+                      (currentTime - new Date(activeCheckIn.checkInTime)) / 1000
+                    ) > maxStayTime;
 
-                return (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={customer.id}>
-                    <Card
-                      sx={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        borderRadius: 2,
-                        border: isOverTime
-                          ? '2px solid #ff1744'
-                          : '1px solid #e0e0e0',
-                        boxShadow: isOverTime
-                          ? 'none'
-                          : '0 2px 12px 0 rgba(25, 118, 210, 0.06)',
-                        backgroundColor: isOverTime ? '#ffeaea' : 'white',
-                        '&:hover': {
-                          backgroundColor: isOverTime ? '#ffd6d6' : '#f8f8f8',
-                          transform: 'translateY(-2px)',
-                          transition: 'all 0.2s ease-in-out',
-                        },
-                      }}>
-                      <CardContent
-                        sx={{ flexGrow: 1, pb: 1, p: isMobile ? 2 : 3 }}>
-                        <Typography
-                          variant='h6'
-                          component='div'
+                  return (
+                    <Grid item xs={6} sm={4} md={3} lg={2} key={customer.id}>
+                      <Card
+                        sx={{
+                          height: { xs: '160px', sm: '180px', md: '200px' },
+                          display: 'flex',
+                          flexDirection: 'column',
+                          borderRadius: 2,
+                          border: isOverTime
+                            ? '2px solid #ff1744'
+                            : '1px solid #e0e0e0',
+                          boxShadow: isOverTime
+                            ? 'none'
+                            : '0 2px 12px 0 rgba(25, 118, 210, 0.06)',
+                          backgroundColor: isOverTime ? '#ffeaea' : 'white',
+                          '&:hover': {
+                            backgroundColor: isOverTime ? '#ffd6d6' : '#f8f8f8',
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.2s ease-in-out',
+                          },
+                        }}>
+                        <CardContent
                           sx={{
-                            fontWeight: 500,
-                            mb: 2,
-                            fontSize: isMobile ? '1rem' : '1.25rem',
-                            color: isOverTime ? '#d50000' : 'inherit',
-                          }}>
-                          {customer.name}
-                        </Typography>
-
-                        <Box
-                          sx={{
+                            flexGrow: 1,
+                            pb: 1,
+                            p: isMobile ? 1.5 : 2,
                             display: 'flex',
+                            flexDirection: 'column',
                             justifyContent: 'space-between',
-                            mb: customer.notes ? 2 : 1,
+                            minHeight: 0,
                           }}>
-                          <Typography
-                            variant='body2'
-                            fontWeight={500}
-                            sx={{ color: isOverTime ? '#d50000' : 'inherit' }}>
-                            {formatDuration(activeCheckIn.checkInTime)}
-                          </Typography>
-                        </Box>
-
-                        {customer.notes && (
-                          <Typography
-                            variant='body2'
-                            sx={{
-                              color: '#666666',
-                              fontFamily: '"Inter", sans-serif',
-                              fontSize: '0.8rem',
-                              fontStyle: 'italic',
-                              whiteSpace: 'pre-wrap',
-                              wordBreak: 'break-word',
-                              opacity: 0.8,
-                            }}>
-                            {customer.notes}
-                          </Typography>
-                        )}
-                      </CardContent>
-
-                      <CardActions sx={{ p: isMobile ? 1 : 2 }}>
-                        <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                          <Tooltip title='Edit Check-in Time'>
-                            <IconButton
-                              onClick={() => {
-                                setEditingCheckIn(activeCheckIn);
-                                setNewCheckInTime(
-                                  moment(activeCheckIn.checkInTime).format(
-                                    'YYYY-MM-DDTHH:mm'
-                                  )
-                                );
-                                setIsEditDialogOpen(true);
-                              }}
+                          <Box sx={{ flexGrow: 1 }}>
+                            <Typography
+                              variant='h6'
+                              component='div'
                               sx={{
-                                border: '1px solid #e0e0e0',
-                                borderRadius: '50%',
-                                width: 40,
-                                height: 40,
+                                fontWeight: 500,
+                                mb: 1.5,
+                                fontSize: isMobile ? '0.9rem' : '1.1rem',
+                                color: isOverTime ? '#d50000' : 'inherit',
+                              }}>
+                              {customer.name}
+                            </Typography>
+
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                mb: customer.notes ? 2 : 1,
+                              }}>
+                              <Typography
+                                variant='body2'
+                                fontWeight={500}
+                                sx={{
+                                  color: isOverTime ? '#d50000' : 'inherit',
+                                }}>
+                                {formatDuration(activeCheckIn.checkInTime)}
+                              </Typography>
+                            </Box>
+
+                            {customer.notes && (
+                              <Typography
+                                variant='body2'
+                                sx={{
+                                  color: '#666666',
+                                  fontFamily: '"Inter", sans-serif',
+                                  fontSize: '0.8rem',
+                                  fontStyle: 'italic',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-word',
+                                  opacity: 0.8,
+                                  flexGrow: 1,
+                                  overflow: 'hidden',
+                                  display: '-webkit-box',
+                                  WebkitLineClamp: 1,
+                                  WebkitBoxOrient: 'vertical',
+                                }}>
+                                {customer.notes}
+                              </Typography>
+                            )}
+                          </Box>
+                        </CardContent>
+
+                        <CardActions sx={{ p: isMobile ? 0.5 : 1 }}>
+                          <Box
+                            sx={{ display: 'flex', gap: 0.5, width: '100%' }}>
+                            <Tooltip title='Edit Check-in Time'>
+                              <IconButton
+                                onClick={() => {
+                                  setEditingCheckIn(activeCheckIn);
+                                  setNewCheckInTime(
+                                    moment(activeCheckIn.checkInTime).format(
+                                      'YYYY-MM-DDTHH:mm'
+                                    )
+                                  );
+                                  setIsEditDialogOpen(true);
+                                }}
+                                sx={{
+                                  border: '1px solid #e0e0e0',
+                                  borderRadius: '50%',
+                                  width: 32,
+                                  height: 32,
+                                  '&:hover': {
+                                    backgroundColor: '#f5f5f5',
+                                    borderColor: '#1976d2',
+                                  },
+                                }}>
+                                <EditIcon fontSize='small' />
+                              </IconButton>
+                            </Tooltip>
+                            <Button
+                              fullWidth
+                              variant='outlined'
+                              startIcon={<LogoutIcon />}
+                              onClick={() => onCheckOut(activeCheckIn)}
+                              sx={{
+                                borderColor: isOverTime ? '#ff1744' : '#1976d2',
+                                color: isOverTime ? '#ff1744' : '#1976d2',
+                                fontWeight: 700,
+                                fontSize: isMobile ? '0.8rem' : '0.9rem',
+                                borderRadius: 8,
                                 '&:hover': {
-                                  backgroundColor: '#f5f5f5',
-                                  borderColor: '#1976d2',
+                                  borderColor: isOverTime
+                                    ? '#ff1744'
+                                    : '#1565c0',
+                                  backgroundColor: isOverTime
+                                    ? '#ffeaea'
+                                    : '#e3f2fd',
                                 },
                               }}>
-                              <EditIcon fontSize='small' />
-                            </IconButton>
-                          </Tooltip>
-                          <Button
-                            fullWidth
-                            variant='outlined'
-                            startIcon={<LogoutIcon />}
-                            onClick={() => onCheckOut(activeCheckIn)}
-                            sx={{
-                              borderColor: isOverTime ? '#ff1744' : '#1976d2',
-                              color: isOverTime ? '#ff1744' : '#1976d2',
-                              fontWeight: 700,
-                              fontSize: isMobile ? '1rem' : '1.1rem',
-                              borderRadius: 8,
-                              '&:hover': {
-                                borderColor: isOverTime ? '#ff1744' : '#1565c0',
-                                backgroundColor: isOverTime
-                                  ? '#ffeaea'
-                                  : '#e3f2fd',
-                              },
-                            }}>
-                            Check Out
-                          </Button>
-                        </Box>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                );
-              })}
+                              Check Out
+                            </Button>
+                          </Box>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  );
+                })}
             </Grid>
           </Fade>
         )}
@@ -496,15 +535,19 @@ function CheckInManager({
             autoFocus
             margin='dense'
             label='Check-in Time'
-            type='datetime-local'
+            type='time'
             fullWidth
             variant='outlined'
-            value={
-              newCheckInTime
-                ? moment(newCheckInTime).format('YYYY-MM-DDTHH:mm')
-                : ''
-            }
-            onChange={(e) => setNewCheckInTime(e.target.value)}
+            value={newCheckInTime ? moment(newCheckInTime).format('HH:mm') : ''}
+            onChange={(e) => {
+              if (editingCheckIn) {
+                const currentDate = moment(editingCheckIn.checkInTime).format(
+                  'YYYY-MM-DD'
+                );
+                const newTime = e.target.value;
+                setNewCheckInTime(`${currentDate}T${newTime}`);
+              }
+            }}
             sx={{ mt: 2 }}
             InputLabelProps={{
               shrink: true,
@@ -513,8 +556,9 @@ function CheckInManager({
           <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
             Current check-in time:{' '}
             {editingCheckIn
-              ? moment(editingCheckIn.checkInTime).format('YYYY-MM-DD HH:mm:ss')
-              : ''}
+              ? moment(editingCheckIn.checkInTime).format('HH:mm:ss')
+              : ''}{' '}
+            (Date will remain unchanged)
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}>
