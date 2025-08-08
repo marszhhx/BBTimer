@@ -88,7 +88,7 @@ function LotteryDialog({ open, onClose, activeCustomers }) {
       const results = calculateDistribution(count, activeCustomers);
       setLotteryResults(results);
       setIsDrawing(false);
-    }, 2000);
+    }, 500);
   };
 
   // 重置抽签
@@ -134,7 +134,11 @@ function LotteryDialog({ open, onClose, activeCustomers }) {
               label='Number of Items to Distribute'
               type='number'
               value={itemCount}
-              onChange={(e) => setItemCount(e.target.value)}
+              onChange={(e) => {
+                const value = Math.max(0, parseInt(e.target.value) || 0);
+                setItemCount(value.toString());
+              }}
+              inputProps={{ min: 0 }}
               sx={{
                 mb: 3,
                 '& .MuiOutlinedInput-root': {
@@ -167,60 +171,54 @@ function LotteryDialog({ open, onClose, activeCustomers }) {
             </Alert>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {lotteryResults.map((result) => (
-                <Paper
-                  key={result.customer.id}
-                  sx={{
-                    p: 2,
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 0,
-                    backgroundColor:
-                      result.items >
-                      Math.floor(parseInt(itemCount) / activeCustomers.length)
-                        ? '#fff3e0'
-                        : '#f5f5f5',
-                  }}>
-                  <Box
+              {lotteryResults
+                .sort((a, b) => b.items - a.items)
+                .map((result) => (
+                  <Paper
+                    key={result.customer.id}
                     sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
+                      p: 2,
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 0,
+                      backgroundColor:
+                        result.items >
+                        Math.floor(parseInt(itemCount) / activeCustomers.length)
+                          ? '#fff3e0'
+                          : '#f5f5f5',
                     }}>
-                    <Box>
-                      <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-                        {result.customer.name}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip
-                        label={`${result.items} item${
-                          result.items !== 1 ? 's' : ''
-                        }`}
-                        color={
-                          result.items >
-                          Math.floor(
-                            parseInt(itemCount) / activeCustomers.length
-                          )
-                            ? 'warning'
-                            : 'default'
-                        }
-                        variant='outlined'
-                      />
-                      {result.items >
-                        Math.floor(
-                          parseInt(itemCount) / activeCustomers.length
-                        ) && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Box>
+                        <Typography
+                          variant='subtitle1'
+                          sx={{ fontWeight: 600 }}>
+                          {result.customer.name}
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Chip
-                          label='Lucky!'
-                          color='warning'
-                          size='small'
-                          icon={<EmojiEventsIcon />}
+                          label={`${result.items} item${
+                            result.items !== 1 ? 's' : ''
+                          }`}
+                          color={
+                            result.items >
+                            Math.floor(
+                              parseInt(itemCount) / activeCustomers.length
+                            )
+                              ? 'warning'
+                              : 'default'
+                          }
+                          variant='outlined'
                         />
-                      )}
+                      </Box>
                     </Box>
-                  </Box>
-                </Paper>
-              ))}
+                  </Paper>
+                ))}
             </Box>
           </Box>
         )}

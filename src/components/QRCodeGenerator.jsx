@@ -64,22 +64,34 @@ function QRCodeGenerator() {
   };
 
   return (
-    <Container maxWidth='sm' sx={{ py: 4 }}>
-      <Box
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: '#fafafa',
+      }}>
+      <Container
+        maxWidth='sm'
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          minHeight: '100vh',
-          pt: 4,
+          pt: { xs: 2, sm: 4, md: 6 },
         }}>
         <Paper
           elevation={0}
           sx={{
             p: isMobile ? 3 : 4,
             width: '100%',
+            maxWidth: 500,
             border: '1px solid #e0e0e0',
             borderRadius: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            backgroundColor: '#ffffff',
           }}>
           <Typography
             variant='h4'
@@ -90,7 +102,7 @@ function QRCodeGenerator() {
               fontWeight: 700,
               mb: 2,
             }}>
-            QR Code Generator
+            Check In Here
           </Typography>
 
           <Typography
@@ -100,7 +112,7 @@ function QRCodeGenerator() {
               color: 'text.secondary',
               mb: 4,
             }}>
-            Scan this QR code to access the self-check-in page
+            Scan the QR code with your phone camera
           </Typography>
 
           <Box
@@ -151,12 +163,20 @@ function QRCodeGenerator() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 3,
+                  width: '100%',
                 }}>
                 <Box
                   sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     border: '2px solid #e0e0e0',
-                    p: 2,
+                    p: 4,
                     borderRadius: 1,
+                    width: 'fit-content',
+                    margin: '0 auto',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.05)',
                   }}>
                   <img
                     src={qrCodeDataUrl}
@@ -165,6 +185,7 @@ function QRCodeGenerator() {
                       width: '300px',
                       height: '300px',
                       maxWidth: '100%',
+                      display: 'block',
                     }}
                   />
                 </Box>
@@ -188,20 +209,9 @@ function QRCodeGenerator() {
               </Box>
             )}
           </Box>
-
-          <Typography
-            variant='body2'
-            sx={{
-              textAlign: 'center',
-              color: 'text.secondary',
-              fontStyle: 'italic',
-            }}>
-            Display this QR code in your location for customers to scan and
-            check in
-          </Typography>
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 

@@ -23,7 +23,6 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { differenceInMinutes } from 'date-fns';
 import moment from 'moment-timezone';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
@@ -71,10 +70,14 @@ function CheckInManager({
   };
 
   const formatDuration = (startTime) => {
-    const minutes = differenceInMinutes(currentTime, new Date(startTime));
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    const seconds = Math.floor((currentTime - new Date(startTime)) / 1000) % 60;
+    const start = new Date(startTime);
+    const now = new Date();
+    const diffInSeconds = Math.max(0, Math.floor((now - start) / 1000));
+
+    const hours = Math.floor(diffInSeconds / 3600);
+    const remainingMinutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+
     return `${hours}h ${remainingMinutes}m ${seconds}s`;
   };
 
@@ -299,7 +302,7 @@ function CheckInManager({
                           sx={{
                             display: 'flex',
                             justifyContent: 'space-between',
-                            mb: 1,
+                            mb: customer.notes ? 2 : 1,
                           }}>
                           <Typography
                             variant='body2'
@@ -308,6 +311,22 @@ function CheckInManager({
                             {formatDuration(activeCheckIn.checkInTime)}
                           </Typography>
                         </Box>
+
+                        {customer.notes && (
+                          <Typography
+                            variant='body2'
+                            sx={{
+                              color: '#666666',
+                              fontFamily: '"Inter", sans-serif',
+                              fontSize: '0.8rem',
+                              fontStyle: 'italic',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word',
+                              opacity: 0.8,
+                            }}>
+                            {customer.notes}
+                          </Typography>
+                        )}
                       </CardContent>
 
                       <CardActions sx={{ p: isMobile ? 1 : 2 }}>

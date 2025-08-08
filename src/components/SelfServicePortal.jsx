@@ -455,46 +455,6 @@ function SelfServicePortal() {
           {isOvertime && ' (OVERTIME)'}
         </Typography>
       </Box>
-
-      <Button
-        fullWidth
-        variant='contained'
-        onClick={handleCheckOut}
-        disabled={isLoading}
-        sx={{
-          py: 2,
-          backgroundColor: isOvertime ? '#d32f2f' : '#1976d2',
-          borderRadius: 0,
-          textTransform: 'none',
-          fontSize: '1.1rem',
-          fontWeight: 600,
-          '&:hover': {
-            backgroundColor: isOvertime ? '#b71c1c' : '#1565c0',
-          },
-          '&:disabled': {
-            backgroundColor: '#e0e0e0',
-          },
-          animation: isOvertime ? 'pulse 2s infinite' : 'none',
-          '@keyframes pulse': {
-            '0%': {
-              boxShadow: '0 0 0 0 rgba(211, 47, 47, 0.7)',
-            },
-            '70%': {
-              boxShadow: '0 0 0 10px rgba(211, 47, 47, 0)',
-            },
-            '100%': {
-              boxShadow: '0 0 0 0 rgba(211, 47, 47, 0)',
-            },
-          },
-        }}>
-        {isLoading ? (
-          <CircularProgress size={24} sx={{ color: 'white' }} />
-        ) : isOvertime ? (
-          'Check Out Now'
-        ) : (
-          'Check Out'
-        )}
-      </Button>
     </Box>
   );
 
@@ -601,105 +561,115 @@ function SelfServicePortal() {
   );
 
   return (
-    <Container maxWidth='sm' sx={{ py: 4 }}>
-      <Box
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: '#fafafa',
+      }}>
+      <Container
+        maxWidth='sm'
         sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          minHeight: '100vh',
-          pt: 4,
+          pt: { xs: 2, sm: 4, md: 6 },
         }}>
         <Paper
           elevation={0}
           sx={{
             p: isMobile ? 3 : 4,
             width: '100%',
+            maxWidth: 500,
             border: isOvertime ? '2px solid #d32f2f' : '1px solid #e0e0e0',
             borderRadius: 0,
-            backgroundColor: isOvertime ? '#fff5f5' : 'inherit',
-            transition: 'all 0.3s ease',
+            backgroundColor: isOvertime ? '#fff5f5' : '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}>
           {isCheckedIn ? renderCheckOutView() : renderCheckInView()}
         </Paper>
-      </Box>
 
-      {/* Confirmation Dialog */}
-      <Dialog
-        open={showConfirmation}
-        onClose={handleCancelConfirmation}
-        maxWidth='sm'
-        fullWidth
-        fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            borderRadius: 0,
-            border: '1px solid #e0e0e0',
-          },
-        }}>
-        <DialogTitle sx={{ pb: 2, borderBottom: '1px solid #e0e0e0' }}>
-          Account Found
-        </DialogTitle>
-        <DialogContent sx={{ mt: 2 }}>
-          <Typography variant='body1' sx={{ mb: 2 }}>
-            An account with this email address already exists:
-          </Typography>
-          <Box
-            sx={{ p: 2, backgroundColor: '#f5f5f5', borderRadius: 1, mb: 2 }}>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>
-              Name: {confirmationData?.existingCustomer?.name}
+        {/* Confirmation Dialog */}
+        <Dialog
+          open={showConfirmation}
+          onClose={handleCancelConfirmation}
+          maxWidth='sm'
+          fullWidth
+          fullScreen={isMobile}
+          PaperProps={{
+            sx: {
+              borderRadius: 0,
+              border: '1px solid #e0e0e0',
+            },
+          }}>
+          <DialogTitle sx={{ pb: 2, borderBottom: '1px solid #e0e0e0' }}>
+            Account Found
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            <Typography variant='body1' sx={{ mb: 2 }}>
+              An account with this email address already exists:
+            </Typography>
+            <Box
+              sx={{ p: 2, backgroundColor: '#f5f5f5', borderRadius: 1, mb: 2 }}>
+              <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                Name: {confirmationData?.existingCustomer?.name}
+              </Typography>
+              <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                Email: {confirmationData?.existingCustomer?.email}
+              </Typography>
+            </Box>
+            <Typography variant='body1' sx={{ mb: 2 }}>
+              You entered: <strong>{confirmationData?.inputName}</strong>
             </Typography>
             <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-              Email: {confirmationData?.existingCustomer?.email}
+              Is this your account? If yes, we'll check you in. If not, please
+              check your information.
             </Typography>
-          </Box>
-          <Typography variant='body1' sx={{ mb: 2 }}>
-            You entered: <strong>{confirmationData?.inputName}</strong>
-          </Typography>
-          <Typography variant='body2' sx={{ color: 'text.secondary' }}>
-            Is this your account? If yes, we'll check you in. If not, please
-            check your information.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}>
-          <Button
-            onClick={handleCancelConfirmation}
-            disabled={isLoading}
-            sx={{
-              color: theme.palette.text.primary,
-              '&:hover': {
-                backgroundColor: 'transparent',
-                color: theme.palette.text.secondary,
-              },
-            }}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirmCheckIn}
-            variant='contained'
-            disabled={isLoading}
-            sx={{
-              backgroundColor: 'black',
-              '&:hover': {
-                backgroundColor: '#333',
-              },
-              '&:disabled': {
-                backgroundColor: '#e0e0e0',
-              },
-              transition: 'all 0.2s ease-in-out',
-              '&:active': {
-                transform: 'scale(0.98)',
-              },
-            }}>
-            {isLoading ? (
-              <CircularProgress size={20} sx={{ color: 'white' }} />
-            ) : (
-              'Yes, Check Me In'
-            )}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #e0e0e0' }}>
+            <Button
+              onClick={handleCancelConfirmation}
+              disabled={isLoading}
+              sx={{
+                color: theme.palette.text.primary,
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                  color: theme.palette.text.secondary,
+                },
+              }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmCheckIn}
+              variant='contained'
+              disabled={isLoading}
+              sx={{
+                backgroundColor: 'black',
+                '&:hover': {
+                  backgroundColor: '#333',
+                },
+                '&:disabled': {
+                  backgroundColor: '#e0e0e0',
+                },
+                transition: 'all 0.2s ease-in-out',
+                '&:active': {
+                  transform: 'scale(0.98)',
+                },
+              }}>
+              {isLoading ? (
+                <CircularProgress size={20} sx={{ color: 'white' }} />
+              ) : (
+                'Yes, Check Me In'
+              )}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </Box>
   );
 }
 

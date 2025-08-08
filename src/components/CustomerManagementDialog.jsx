@@ -16,25 +16,38 @@ import {
   Divider,
   Alert,
   Tooltip,
+  InputAdornment,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PeopleIcon from '@mui/icons-material/People';
+import SearchIcon from '@mui/icons-material/Search';
 import { updateCustomer, deleteCustomer } from '../services/firebaseService';
 
 const CustomerManagementDialog = ({ open, onClose, customers }) => {
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [editNotes, setEditNotes] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter customers based on search query
+  const filteredCustomers = customers.filter(
+    (customer) =>
+      customer.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      customer.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleEdit = (customer) => {
     setEditingCustomer(customer.id);
     setEditName(customer.name || '');
     setEditEmail(customer.email || '');
+    setEditNotes(customer.notes || '');
     setError('');
     setSuccess('');
   };
@@ -43,6 +56,7 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
     setEditingCustomer(null);
     setEditName('');
     setEditEmail('');
+    setEditNotes('');
     setError('');
     setSuccess('');
   };
@@ -57,11 +71,13 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
       await updateCustomer(editingCustomer, {
         name: editName.trim(),
         email: editEmail.trim() || null,
+        notes: editNotes.trim() || null,
       });
       setSuccess('Customer updated successfully');
       setEditingCustomer(null);
       setEditName('');
       setEditEmail('');
+      setEditNotes('');
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
       setError('Failed to update customer');
@@ -111,15 +127,39 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
           </Alert>
         )}
 
-        {customers.length === 0 ? (
+        {/* Search Input */}
+        <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+          <TextField
+            fullWidth
+            placeholder='Search customers by name, email, or notes...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'>
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 0,
+              },
+            }}
+          />
+        </Box>
+
+        {filteredCustomers.length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant='body1' color='text.secondary'>
-              No customers found
+              {searchQuery
+                ? 'No customers found matching your search'
+                : 'No customers found'}
             </Typography>
           </Box>
         ) : (
           <List sx={{ p: 0 }}>
-            {customers.map((customer, index) => (
+            {filteredCustomers.map((customer, index) => (
               <React.Fragment key={customer.id}>
                 <ListItem sx={{ px: 3, py: 2 }}>
                   {editingCustomer === customer.id ? (
@@ -144,7 +184,18 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
                             label='Email Address'
                             value={editEmail}
                             onChange={(e) => setEditEmail(e.target.value)}
+                            sx={{ mb: 2 }}
                             size='small'
+                          />
+                          <TextField
+                            fullWidth
+                            label='Notes'
+                            value={editNotes}
+                            onChange={(e) => setEditNotes(e.target.value)}
+                            multiline
+                            rows={3}
+                            size='small'
+                            placeholder='Add notes about this customer...'
                           />
                         </Box>
                         <Box
@@ -174,18 +225,30 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
                       </Box>
                     </Box>
                   ) : (
-                    <ListItemText
-                      primary={customer.name}
-                      secondary={customer.email || 'No email provided'}
-                      primaryTypographyProps={{
-                        variant: 'body1',
-                        fontWeight: 500,
-                      }}
-                      secondaryTypographyProps={{
-                        variant: 'body2',
-                        color: 'text.secondary',
-                      }}
-                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant='body1' fontWeight={500}>
+                        {customer.name}
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {customer.email || 'No email provided'}
+                      </Typography>
+                      {customer.notes && (
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            mt: 1,
+                            color: '#666666',
+                            fontFamily: '"Inter", sans-serif',
+                            fontSize: '0.8rem',
+                            fontStyle: 'italic',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            opacity: 0.8,
+                          }}>
+                          {customer.notes}
+                        </Typography>
+                      )}
+                    </Box>
                   )}
 
                   {editingCustomer !== customer.id && (
@@ -213,7 +276,7 @@ const CustomerManagementDialog = ({ open, onClose, customers }) => {
                     </ListItemSecondaryAction>
                   )}
                 </ListItem>
-                {index < customers.length - 1 && <Divider />}
+                {index < filteredCustomers.length - 1 && <Divider />}
               </React.Fragment>
             ))}
           </List>
